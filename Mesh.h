@@ -2,6 +2,7 @@
 
 #include <OpenGL/gl.h>
 #include <GLFW/glfw3.h>
+#include <vector>
 
 
 class Mesh {
@@ -12,18 +13,20 @@ public:
     };
 
     vertex* vertices;
+    std::vector<GLuint> indices;
     //GLushort* indices;
-    const GLushort indices[14] = {
-        //strip 1
-        0, 3, 1, 4, 2, 5, 
-        5, 3, // degen triangle
-        3, 6, 4, 7, 5, 8
-    };
+    // const GLushort indices[14] = {
+    //     //strip 1
+    //     0, 3, 1, 4, 2, 5, 
+    //     5, 3, // degen triangle
+    //     3, 6, 4, 7, 5, 8
+    // };
     float maxCoord; 
     int nVertices, nIndices, N;
 
     Mesh(int N_, float maxCoord_);
     void generateMesh();
+    void generateIndices();
 
     void update();
 };

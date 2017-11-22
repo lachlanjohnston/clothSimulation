@@ -30,7 +30,6 @@ static void error_callback(int error, const char* description)
 
 int main() {
 	// Begin by creating an OpenGL context
-
 	GLFWwindow* window;
 
 	glfwSetErrorCallback(error_callback);
@@ -38,7 +37,9 @@ int main() {
         exit(EXIT_FAILURE);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+
     window = glfwCreateWindow(640, 480, "Simple example", NULL, NULL);
+
     if (!window)
     {
         glfwTerminate();
@@ -48,21 +49,14 @@ int main() {
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
 
-	window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
-	
-	int n = 3; float maxDistance = .2f;
+	int n = 10; float maxDistance = .8f;
 	Mesh* mesh = new Mesh(n, maxDistance);
 	Renderer* r = new Renderer(mesh, window);
 
-	// //std::cout << "here1" << std::endl;
-
 	while (!glfwWindowShouldClose(window)) {
 		
-		// mesh->update(); // update mesh via physics engine
+		mesh->update(); // update mesh via physics engine
 		r->update();    // render mesh
-
-		glfwSwapBuffers(window);
-		glfwPollEvents();
     }
 
 	glfwDestroyWindow(window);

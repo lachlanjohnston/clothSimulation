@@ -19,6 +19,8 @@ public:
     GLuint meshElementBuffer, vertexObjectBuffer, program, vertexShader, fragShader;
     GLint positionLoc, colorLoc, MVP;
 
+    int elementSize;
+
     const char* vertex_shader_text =
         "uniform mat4 MVP;\n"
         "attribute vec3 vCol;\n"
