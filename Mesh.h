@@ -12,7 +12,13 @@ public:
     };
 
     vertex* vertices;
-    GLushort* indices;
+    //GLushort* indices;
+    const GLushort indices[14] = {
+        //strip 1
+        0, 3, 1, 4, 2, 5, 
+        5, 3, // degen triangle
+        3, 6, 4, 7, 5, 8
+    };
     float maxCoord; 
     int nVertices, nIndices, N;
 

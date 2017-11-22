@@ -18,30 +18,56 @@
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;
 
+static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, GLFW_TRUE);
+}
+static void error_callback(int error, const char* description)
+{
+    fprintf(stderr, "Error: %s\n", description);
+}
+
 int main() {
 	// Begin by creating an OpenGL context
+
 	GLFWwindow* window;
 
-	if (!glfwInit())
-		return -1;
-
+	glfwSetErrorCallback(error_callback);
+    if (!glfwInit())
+        exit(EXIT_FAILURE);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+    window = glfwCreateWindow(640, 480, "Simple example", NULL, NULL);
+    if (!window)
+    {
+        glfwTerminate();
+        exit(EXIT_FAILURE);
+    }
+    glfwSetKeyCallback(window, key_callback);
     glfwMakeContextCurrent(window);
-	glfwSwapInterval(1);
+    glfwSwapInterval(1);
 
 	window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
 	
-	int n = 20; float maxDistance = .2f;
+	int n = 3; float maxDistance = .2f;
 	Mesh* mesh = new Mesh(n, maxDistance);
 	Renderer* r = new Renderer(mesh, window);
 
+	// //std::cout << "here1" << std::endl;
+
 	while (!glfwWindowShouldClose(window)) {
 		
-		mesh->update(); // update mesh via physics engine
+		// mesh->update(); // update mesh via physics engine
 		r->update();    // render mesh
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
     }
+
+	glfwDestroyWindow(window);
+    glfwTerminate();
+    exit(EXIT_SUCCESS);
     
-    return 1;
+    return 0;
 }
