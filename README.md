@@ -12,7 +12,7 @@
  
  ### Method
  
- The cloth will be rendered using OpenGL 3.2. A (TBD) linear algerbra library will be used in order to compute different aspects of the physics model. The cloth will be simulated using a simple display loop, where all objects are updated by their respective physics engine, and then pushed to an OpenGL renderer to be drawn to the screen.
+ The cloth will be rendered using OpenGL 3.2. A (TBD) linear algebra library will be used in order to compute different aspects of the physics model. The cloth will be simulated using a simple display loop, where all objects are updated by their respective physics engine, and then pushed to an OpenGL renderer to be drawn to the screen.
  
  -- INSERT MATH HERE --
  
