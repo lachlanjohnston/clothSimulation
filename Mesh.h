@@ -13,10 +13,10 @@ public:
 
     vertex* vertices;
     GLushort* indices;
-    float initialDistance;
+    float maxCoord; 
     int nVertices, nIndices, N;
 
-    Mesh(int N_, float initialDistance_);
+    Mesh(int N_, float maxCoord_);
     void generateMesh();
 
     void update();
