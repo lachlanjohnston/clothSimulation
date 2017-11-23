@@ -32,10 +32,10 @@ void Renderer::initialize() {
     colorLoc = glGetAttribLocation(program, "vCol");
     glEnableVertexAttribArray(positionLoc);
     glVertexAttribPointer(positionLoc, 2, GL_FLOAT, GL_FALSE,
-                          sizeof(float) * 6, (void*) 0);
+                          sizeof(float) * 7, (void*) 0);
     glEnableVertexAttribArray(colorLoc);
     glVertexAttribPointer(colorLoc, 3, GL_FLOAT, GL_FALSE,
-                         sizeof(float) * 6, (void*) (sizeof(float) * 3));
+                         sizeof(float) * 7, (void*) (sizeof(float) * 4));
 
     return;
 }
