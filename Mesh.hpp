@@ -45,8 +45,8 @@ public:
         vec g; float mass;
         void operator()(const vec &pos, vec &velocity, double /*t*/) {
             // need to implement other forces
-            vec force = g * mass;
-            velocity += force;
+            // vec force = g * mass;
+            // velocity += force;
         }
     };
     void update();
