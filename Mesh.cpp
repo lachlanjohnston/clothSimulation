@@ -12,14 +12,13 @@ Mesh::Mesh(int N_, float maxCoord_)
 void Mesh::generateMesh() {
     float d = ((2.f) * maxCoord) / (N-1);
     float z = 0.f;
-    float w = 1.0f;
 
     float y = maxCoord;
 
     for (int i = 0; i < N; i++) {
         float x = (-1.f) * maxCoord;
         for(int j = 0; j < N; j++) {
-            vertex v = {x, y, z, w, 1.f, 1.f, 1.f};
+            vertex v = {x, y, z, 1.f, 1.f, 1.f};
             vertices[j + (i*N)] = v;
             times[j + (i*N)] = 0;
 

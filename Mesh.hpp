@@ -19,7 +19,7 @@ typedef runge_kutta_dopri5<vec > stepperType;
 class Mesh {
 public:
     struct vertex {
-        float x, y, z, w;
+        float x, y, z;
         float r, g, b;
     };
 

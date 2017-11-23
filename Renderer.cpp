@@ -32,10 +32,10 @@ void Renderer::initialize() {
     colorLoc = glGetAttribLocation(program, "vCol");
     glEnableVertexAttribArray(positionLoc);
     glVertexAttribPointer(positionLoc, 2, GL_FLOAT, GL_FALSE,
-                          sizeof(float) * 7, (void*) 0);
+                          sizeof(float) * 6, (void*) 0);
     glEnableVertexAttribArray(colorLoc);
     glVertexAttribPointer(colorLoc, 3, GL_FLOAT, GL_FALSE,
-                         sizeof(float) * 7, (void*) (sizeof(float) * 4));
+                         sizeof(float) * 6, (void*) (sizeof(float) * 3));
 
     return;
 }
@@ -48,7 +48,7 @@ void Renderer::render() {
 void Renderer::update() {
     // delegate required frame update tasks
 
-    glBufferData(GL_ARRAY_BUFFER, (mesh->nVertices) * (7 * sizeof(float)), mesh->vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, (mesh->nVertices) * (6 * sizeof(float)), mesh->vertices, GL_STATIC_DRAW);
     glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
     float ratio;
     int width, height;

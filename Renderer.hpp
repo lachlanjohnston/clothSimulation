@@ -24,11 +24,11 @@ public:
     const char* vertex_shader_text =
         "uniform mat4 MVP;\n"
         "attribute vec3 vCol;\n"
-        "attribute vec4 vPos;\n"
+        "attribute vec3 vPos;\n"
         "varying vec3 color;\n"
         "void main()\n"
         "{\n"
-        "    gl_Position = MVP * vPos;\n"
+        "    gl_Position = MVP * vec4(vPos, 1.0);\n"
         "    color = vCol;\n"
         "}\n";
     const char* fragment_shader_text =
