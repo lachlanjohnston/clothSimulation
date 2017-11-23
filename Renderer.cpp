@@ -1,4 +1,4 @@
-#include "Renderer.h"
+#include "Renderer.hpp"
 #include <iostream>
 
 Renderer::Renderer(Mesh* mesh_, GLFWwindow* window_) 
