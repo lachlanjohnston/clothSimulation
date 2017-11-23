@@ -48,7 +48,7 @@ void Renderer::render() {
 void Renderer::update() {
     // delegate required frame update tasks
 
-    glBufferData(GL_ARRAY_BUFFER, (mesh->nVertices) * (6 * sizeof(float)), mesh->vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, (mesh->nVertices) * (7 * sizeof(float)), mesh->vertices, GL_STATIC_DRAW);
     glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
     float ratio;
     int width, height;
