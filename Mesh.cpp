@@ -1,9 +1,9 @@
 #include "Mesh.h"
-#include <iostream>
 
 Mesh::Mesh(int N_, float maxCoord_)
     : N(N_), maxCoord(maxCoord_), nVertices(N_*N_)  {
         this->vertices = new vertex[nVertices];
+        this->times = new float[nVertices];
         generateMesh();
         generateIndices();
     };
@@ -19,6 +19,7 @@ void Mesh::generateMesh() {
         for(int j = 0; j < N; j++) {
             vertex v = {x, y, z, 1.f, 1.f, 1.f};
             vertices[j + (i*N)] = v;
+            times[j + (i*N)] = 0;
             x += d;
         }
         y -= d;
@@ -48,9 +49,27 @@ void Mesh::generateIndices() {
     }
 }
 
+void Mesh::step(vector<float> pos, vector<float> dposdt, const double /* t */) {
+        float force = mass * gravity;
+        dposdt[1] = dposdt[1] - force;
+        pos[1] += dposdt[1]
+
+        return;
+    }
+
 void Mesh::update() {
     // physics here, must complete before rendering
-    // for (int i = 0; i < nVertices; i++)
-    //     vertices[i].y -= .0098;
+    for (int i = 0; i < nVertices; i++) {
+        vertex* curVertex = &vertices[i];
+        vector<float> position(3);
+        position[0] = curVertex->x;
+        position[1] = curVertex->y;
+        position[2] = curVertex->z;
+        vector<float> velocity_ = velocity[i];
+        float t = times[i];
+        std::cout << "t at vertex one: " << t << std::endl;
+        stepper.do_step(step, position, velocity_, t, dt);
+    }
+
     return;
 }
