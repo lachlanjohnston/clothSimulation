@@ -54,7 +54,6 @@ int main() {
 	Renderer* r = new Renderer(mesh, window);
 
 	while (!glfwWindowShouldClose(window)) {
-		
 		mesh->update(); // update mesh via physics engine
 		r->update();    // render mesh
     }
