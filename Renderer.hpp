@@ -3,7 +3,6 @@
 #include <OpenGL/gl.h>
 #include <GLFW/glfw3.h>
 #include "Mesh.hpp"
-#include "linmath.h"
 
 class Renderer {
 public:

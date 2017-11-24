@@ -31,10 +31,12 @@ public:
     Mesh(int N_, float maxCoord_);
     void generateMesh();
     void generateIndices();
+    std::vector<GLuint> determineNN(int index);
 
     // physics 
 
     std::vector<vec > velocities;
+    std::vector<std::vector<GLuint> > NN;
     const float dt = 0.01f;
     const static float mass = 0.01f;
     float* times;

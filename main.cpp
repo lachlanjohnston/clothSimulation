@@ -49,7 +49,8 @@ int main() {
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
 
-	int n = 10; float maxDistance = .8f;
+    //n must be AT LEAST 3!!!
+	int n = 4; float maxDistance = .8f;
 	Mesh* mesh = new Mesh(n, maxDistance);
 	Renderer* r = new Renderer(mesh, window);
 

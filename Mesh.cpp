@@ -19,8 +19,10 @@ void Mesh::generateMesh() {
         float x = (-1.f) * maxCoord;
         for(int j = 0; j < N; j++) {
             vertex v = {x, y, z, 1.f, 1.f, 1.f};
-            vertices[j + (i*N)] = v;
-            times[j + (i*N)] = 0;
+
+            int index = j + (i*N);
+            vertices[index] = v;
+            times[index] = 0;
 
             std::vector<float> velocityv;
             velocityv.resize(3);
@@ -30,12 +32,74 @@ void Mesh::generateMesh() {
 
             vec velocity(velocityv);
             velocities.push_back(velocity);
+
+            std::vector<GLuint> vNN = determineNN(index);
+            NN.push_back(vNN);
+
+            std::cout << "[" << index << "] ";
+            
+            std::vector<GLuint>::iterator it;
+            for(it = vNN.begin(); it != vNN.end(); it++)
+                std::cout << *it << " ";
+            std::cout << std::endl;
+
             x += d;
         }
         y -= d;
     }
 
     return;
+}
+
+std::vector<GLuint> Mesh::determineNN(int index) {
+    //ugly if statements incoming....
+
+    std::vector<GLuint> vNN;
+
+    /* lets figure out it is a corner first */
+
+    if(index == 0) //top left
+        { vNN.push_back(index+1); vNN.push_back(index+N); vNN.push_back(index+N+1); vNN.resize(3); return vNN; }
+    if(index == (N-1)) // top right
+        { vNN.push_back(index-1); vNN.push_back(index+N); vNN.push_back(index+N-1); vNN.resize(3); return vNN; }
+    if(index == (N*N-N)) // bottom left
+        { vNN.push_back(index+1); vNN.push_back(index-N); vNN.push_back(index-N+1); vNN.resize(3); return vNN;}
+    if(index == (N*N-1)) // bottom right
+        { vNN.push_back(index-1); vNN.push_back(index-N); vNN.push_back(index-N-1); vNN.resize(3); return vNN;}
+
+    /* checking top edge of mesh */
+    if(index < N) {
+        vNN.push_back(index-1); vNN.push_back(index+1); vNN.push_back(index+N); vNN.push_back(index+N-1); vNN.push_back(index+N+1);
+        vNN.resize(5); 
+        return vNN;
+    }
+
+    /* checking left edge of mesh */
+    if (index % N == 0) {
+        vNN.push_back(index+1); vNN.push_back(index-N); vNN.push_back(index-N+1); vNN.push_back(index+N); vNN.push_back(index+N+1);
+        vNN.resize(5); 
+        return vNN;
+    }
+
+    /* checking right edge of mesh */
+    if((index+1) % N == 0) {
+        vNN.push_back(index-1); vNN.push_back(index-N); vNN.push_back(index-N-1); vNN.push_back(index+N); vNN.push_back(index+N-1);
+        vNN.resize(5); 
+        return vNN;
+    }
+
+    /* checking bottom edge of mesh */
+    if((index >= (N*N-N)) && (index < (N*N))) {
+        vNN.push_back(index-1); vNN.push_back(index+1); vNN.push_back(index-N); vNN.push_back(index-N-1); vNN.push_back(index-N+1);
+        vNN.resize(5); 
+        return vNN;
+    }
+
+    vNN.push_back(index-1); vNN.push_back(index+1); vNN.push_back(index-N); vNN.push_back(index+N);
+    vNN.push_back(index-N-1); vNN.push_back(index-N+1); vNN.push_back(index+N-1); vNN.push_back(index+N+1);
+    vNN.resize(8);
+    
+    return vNN;
 }
 
 void Mesh::generateIndices() {
