@@ -35,8 +35,11 @@ int main() {
 	glfwSetErrorCallback(error_callback);
     if (!glfwInit())
         exit(EXIT_FAILURE);
+
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+    // glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    // glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     window = glfwCreateWindow(640, 480, "Simple example", NULL, NULL);
 
@@ -50,7 +53,7 @@ int main() {
     glfwSwapInterval(1);
 
     //n must be AT LEAST 3!!!
-	int n = 20; float maxDistance = 50.f;
+	int n = 20; float maxDistance = 1.f;
 	Mesh* mesh = new Mesh(n, maxDistance);
 	Renderer* r = new Renderer(mesh, window);
 

@@ -21,6 +21,7 @@ public:
     struct vertex {
         float x, y, z;
         float r, g, b;
+        float n1, n2, n3;
     };
 
     vertex* vertices;

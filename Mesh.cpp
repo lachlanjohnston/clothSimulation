@@ -5,7 +5,7 @@ Mesh::Mesh(int N_, float maxCoord_)
       dt(0.01f), mass(1.0f) {
         this->vertices = new vertex[nVertices];
         this->times = new float[nVertices];
-        this->gravity = Force(0.0, 0.0, -10.0);
+        this->gravity = Force(0.0, 0.0, -0.1);
         generateMesh();
         generateIndices();
     };
@@ -20,7 +20,7 @@ void Mesh::generateMesh() {
     for (int i = 0; i < N; i++) {
         float x = (-1.f) * maxCoord;
         for(int j = 0; j < N; j++) {
-            vertex v = {x, y, z, 1.f, 0.5f, 1.f};
+            vertex v = {x, y, z, 1.f, 1.f, 1.f, 0.0f, 0.0f, 1.0f};
 
             int index = j + (i*N);
             vertices[index] = v;
