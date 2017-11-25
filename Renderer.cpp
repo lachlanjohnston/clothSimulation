@@ -102,8 +102,52 @@ void Renderer::render() {
 void Renderer::update() {
     // delegate required frame update tasks
 
+    std::vector<std::vector<GLuint> > NNary = mesh->NN;
+    int N = mesh->N;
+
+    for(int i = 0; i < mesh->nVertices; i++) {
+        std::vector<GLuint> vNN = NNary[i];
+
+        mesh->vertices[i].n1 = 0.f;
+        mesh->vertices[i].n2 = 0.f;
+        mesh->vertices[i].n3 = 0.f;
+
+        glm::vec3 self(mesh->vertices[i].x, mesh->vertices[i].y, mesh->vertices[i].z);
+        glm::vec3 vLeft(self), vRight(self), vAbove(self), vBelow(self);
+
+        for(auto it = vNN.begin(); it != vNN.end(); it++) {
+            
+            if((i - 1) == *it) { //left
+                vLeft = glm::vec3(mesh->vertices[*it].x, mesh->vertices[*it].y, mesh->vertices[*it].z);
+            }
+
+            if((i + 1) == *it) { //right
+                vRight = glm::vec3(mesh->vertices[*it].x, mesh->vertices[*it].y, mesh->vertices[*it].z);
+            }
+
+            if((i - N) == *it) { //above
+                vAbove = glm::vec3(mesh->vertices[*it].x, mesh->vertices[*it].y, mesh->vertices[*it].z);
+            }
+
+            if((i + N) == *it) { //below
+                vBelow = glm::vec3(mesh->vertices[*it].x, mesh->vertices[*it].y, mesh->vertices[*it].z);
+            }
+        }
+
+         glm::vec3 xDiff(vRight.x - vLeft.x, vRight.y - vLeft.y, vRight.z - vLeft.z);
+         glm::vec3 yDiff(vAbove.x - vBelow.x, vAbove.y - vBelow.y, vAbove.z - vBelow.z);
+
+         glm::vec3 vN (glm::normalize(glm::cross(xDiff, yDiff)));
+
+         mesh->vertices[i].n1 = vN[0];
+         mesh->vertices[i].n2 = vN[1];
+         mesh->vertices[i].n3 = vN[2];
+
+    }
+
     glBufferData(GL_ARRAY_BUFFER, (mesh->nVertices) * (9 * sizeof(float)), mesh->vertices, GL_DYNAMIC_DRAW);
     //glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
+    //glShadeModel(GL_FLAT);
     float ratio;
     int width, height;
     glm::mat4 m, v, p, mvp;
