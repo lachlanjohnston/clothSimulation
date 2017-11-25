@@ -60,7 +60,7 @@ void Renderer::update() {
     // delegate required frame update tasks
 
     glBufferData(GL_ARRAY_BUFFER, (mesh->nVertices) * (6 * sizeof(float)), mesh->vertices, GL_DYNAMIC_DRAW);
-    //glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
+    glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
     float ratio;
     int width, height;
     glm::mat4 m, v, p, mvp;
@@ -69,7 +69,7 @@ void Renderer::update() {
     glViewport(0, 0, width, height);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glm::vec3 Pos(1.0f, 1.0f, 1.f);
+    glm::vec3 Pos(70.0f, 70.0f, 70.f);
     glm::vec3 Target(0.0f, 0.0f, 0.0f);
     glm::vec3 Up(0.0f, 1.0f, 0.0f);
 
@@ -77,7 +77,7 @@ void Renderer::update() {
 
     m = glm::scale(glm::mat4(1.0f), glm::vec3(0.5f)); //note: scale can cause issues with lighting
     v = glm::lookAt(Pos, Target, Up);
-    p = glm::perspective(fov,ratio,0.1f,10.0f);
+    p = glm::perspective(fov,ratio,0.1f,1000.0f);
 
     mvp = p * v * m;
  

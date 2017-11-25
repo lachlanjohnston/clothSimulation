@@ -1,10 +1,11 @@
 #include "Mesh.hpp"
 
 Mesh::Mesh(int N_, float maxCoord_)
-    : N(N_), maxCoord(maxCoord_), nVertices(N_*N_)  {
+    : N(N_), maxCoord(maxCoord_), nVertices(N_*N_), 
+      dt(0.01f), mass(1.0f) {
         this->vertices = new vertex[nVertices];
         this->times = new float[nVertices];
-        this->gravity = Force(0.0, -9.8, 0.0);
+        this->gravity = Force(0.0, 0.0, -10.0);
         generateMesh();
         generateIndices();
     };
@@ -12,13 +13,14 @@ Mesh::Mesh(int N_, float maxCoord_)
 void Mesh::generateMesh() {
     float d = ((2.f) * maxCoord) / (N-1);
     float z = 0.f;
+    restLength = d;
 
     float y = maxCoord;
 
     for (int i = 0; i < N; i++) {
         float x = (-1.f) * maxCoord;
         for(int j = 0; j < N; j++) {
-            vertex v = {x, y, z, 1.f, 1.f, 1.f};
+            vertex v = {x, y, z, 1.f, 0.5f, 1.f};
 
             int index = j + (i*N);
             vertices[index] = v;
@@ -35,13 +37,6 @@ void Mesh::generateMesh() {
 
             std::vector<GLuint> vNN = determineNN(index);
             NN.push_back(vNN);
-
-            std::cout << "[" << index << "] ";
-            
-            std::vector<GLuint>::iterator it;
-            for(it = vNN.begin(); it != vNN.end(); it++)
-                std::cout << *it << " ";
-            std::cout << std::endl;
 
             x += d;
         }
@@ -123,33 +118,84 @@ void Mesh::generateIndices() {
     }
 }
 
+vec Mesh::vectorize(vertex* v) {
+    std::vector<float> positionv;
+
+    positionv.resize(3);
+    positionv[0] = v->x;
+    positionv[1] = v->y;
+    positionv[2] = v->z;
+
+    vec position(positionv);
+
+    return position;
+}
+
+vec normalize(vec v, float norm) { return v / norm; }
+
+vec springForce(vec v1, vec v2, float k, float restLength) {
+    vec d = v1 - v2;
+    float norm = norm_2(d);
+    float x = norm - restLength;
+    vec n = normalize(d, norm);
+
+    return k * x * n;
+}
+
+vec squareVector(vec v) { 
+    for (auto i : v) i *= i; 
+    return v;
+}
+
+struct sys {
+    vec g; float mass, restLength, k;
+    std::vector<vec>  NN;
+    void operator()(const vec &pos, vec &velocity, double /*t*/) {
+        // need to implement other forces
+        // vec force = g * mass;
+        // velocity = force;
+        std::vector<vec> springForces;
+
+        for (auto i : NN) // calculate spring forces
+            springForces.push_back(springForce(i, pos, k, restLength));
+        
+        for (auto force : springForces)
+            velocity += force; // apply forces
+
+        vec squareVelocity = velocity;
+
+        velocity += g * mass - 0.1 * squareVector(squareVelocity); // apply gravity & bogodrag
+    }
+};
+
 void Mesh::update() {
     // physics here, must complete before rendering
-    for (int i = 0; i < nVertices; i++) {
+
+    for (int i = 20; i < nVertices; i++) {
         vertex* curVertex = &vertices[i];
-        // std::vector<float> position;
-        // std::vector<float> velocity = velocities[i];
         float t = times[i];
 
-        std::vector<float> positionv;
-        
-
-        positionv.resize(3);
-        positionv[0] = curVertex->x;
-        positionv[1] = curVertex->y;
-        positionv[2] = curVertex->z;
-
-        vec position(positionv);
+        std::vector<vec> connectedMasses;
+        vec position = vectorize(curVertex);
+        for (auto j : NN[i]) {
+            vertex* n = &vertices[j];
+            connectedMasses.push_back(vectorize(n));
+        }
 
         sys s;
         s.g = gravity.force;
         s.mass = mass;
+        s.restLength = restLength;
+        s.k = 6;
+        s.NN = connectedMasses;
         stepper.do_step(s, position, t, dt);
 
         curVertex->x = position[0];
         curVertex->y = position[1];
         curVertex->z = position[2];
     }
+
+    
 
     return;
 }

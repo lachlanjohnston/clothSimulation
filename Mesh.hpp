@@ -13,7 +13,7 @@ using namespace boost::numeric::ublas;
 
 typedef boost::numeric::ublas::vector<float, std::vector<float> > vec;
 
-typedef runge_kutta_dopri5<vec > stepperType;
+typedef runge_kutta_dopri5<vec> stepperType;
 // typedef std::vector<float> vec;
 
 class Mesh {
@@ -37,23 +37,17 @@ public:
 
     std::vector<vec > velocities;
     std::vector<std::vector<GLuint> > NN;
-    const float dt = 0.01f;
-    const static float mass = 0.01f;
+    float dt;
+    float mass;
+    float restLength;
     float* times;
     stepperType stepper;
     Force gravity;
 
-    struct sys {
-        vec g; float mass;
-        void operator()(const vec &pos, vec &velocity, double /*t*/) {
-            // need to implement other forces
-            // vec force = g * mass;
-            // velocity = force;
-            velocity[2] = -1.f;
-            //velocity[] = -1.f;
-            //std::cout << pos[0] << " " << pos[1] << " " << pos[2] << std::endl;
-        }
-    };
+    vec vectorize(vertex* v);
+    float normalize(vec v, float norm);
+    vec squareVector(vec v);
+        
     void update();
 };
 

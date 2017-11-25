@@ -50,7 +50,7 @@ int main() {
     glfwSwapInterval(1);
 
     //n must be AT LEAST 3!!!
-	int n = 4; float maxDistance = .8f;
+	int n = 20; float maxDistance = 50.f;
 	Mesh* mesh = new Mesh(n, maxDistance);
 	Renderer* r = new Renderer(mesh, window);
 
