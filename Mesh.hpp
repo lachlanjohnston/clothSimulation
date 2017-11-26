@@ -14,6 +14,7 @@ using namespace boost::numeric::ublas;
 typedef boost::numeric::ublas::vector<float, std::vector<float> > vec;
 
 typedef runge_kutta_dopri5<vec> stepperType;
+typedef std::vector<vec> stateType;
 // typedef std::vector<float> vec;
 
 class Mesh {
@@ -33,17 +34,22 @@ public:
     void generateMesh();
     void generateIndices();
     std::vector<GLuint> determineNN(int index);
+    void verlet();
 
     // physics 
 
     std::vector<vec > velocities;
+    std::vector<vec > oldPos;
+    std::vector<vec > forces;
+
+
     std::vector<std::vector<GLuint> > NN;
+    std::vector<stepperType > steppers;
     float dt;
     float mass;
     float restLength;
     float* times;
-    stepperType stepper;
-    Force gravity;
+    Force gravity, wind;
 
     vec vectorize(vertex* v);
     float normalize(vec v, float norm);

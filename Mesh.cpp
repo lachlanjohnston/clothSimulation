@@ -2,10 +2,11 @@
 
 Mesh::Mesh(int N_, float maxCoord_)
     : N(N_), maxCoord(maxCoord_), nVertices(N_*N_), 
-      dt(0.01f), mass(1.0f) {
+      dt(0.01f), mass(0.01f) {
         this->vertices = new vertex[nVertices];
         this->times = new float[nVertices];
-        this->gravity = Force(0.0, 0.0, -0.1);
+        this->gravity = Force(0.0, -9.8, 0.0);
+        this->wind = Force(0.0, 0.0, -0.05);
         generateMesh();
         generateIndices();
     };
@@ -24,16 +25,16 @@ void Mesh::generateMesh() {
 
             int index = j + (i*N);
             vertices[index] = v;
-            times[index] = 0;
 
-            std::vector<float> velocityv;
-            velocityv.resize(3);
-            velocityv.push_back(0);
-            velocityv.push_back(0);
-            velocityv.push_back(0);
+            std::vector<float> _oldPos;
+            _oldPos.push_back(x);
+            _oldPos.push_back(y);
+            _oldPos.push_back(z);
+            _oldPos.resize(3);
+            oldPos.push_back(_oldPos);
 
-            vec velocity(velocityv);
-            velocities.push_back(velocity);
+            Force force(0.0, 0.0, 0.0);
+            forces.push_back(force.force);
 
             std::vector<GLuint> vNN = determineNN(index);
             NN.push_back(vNN);
@@ -137,9 +138,11 @@ vec springForce(vec v1, vec v2, float k, float restLength) {
     vec d = v1 - v2;
     float norm = norm_2(d);
     float x = norm - restLength;
+
     vec n = normalize(d, norm);
 
-    return k * x * n;
+    vec force = k * x * n;
+    return force;
 }
 
 vec squareVector(vec v) { 
@@ -147,55 +150,58 @@ vec squareVector(vec v) {
     return v;
 }
 
-struct sys {
-    vec g; float mass, restLength, k;
-    std::vector<vec>  NN;
-    void operator()(const vec &pos, vec &velocity, double /*t*/) {
-        // need to implement other forces
-        // vec force = g * mass;
-        // velocity = force;
-        std::vector<vec> springForces;
+void Mesh::verlet() {
+    for (int i = N; i < nVertices; i++) {
+        vertex* curVertex = &vertices[i];
+        std::vector<vec> connectedMasses;
+        vec pos = vectorize(curVertex);
+        vec old = oldPos[i];
+        oldPos[i] = pos;
+        vec totalForce = forces[i];
+        vec a = totalForce / mass;
 
-        for (auto i : NN) // calculate spring forces
-            springForces.push_back(springForce(i, pos, k, restLength));
-        
-        for (auto force : springForces)
-            velocity += force; // apply forces
+        // std::cout << totalForce[0] << " " << totalForce[1] << " " << totalForce[2] << std::endl;
+        curVertex->x = (2.00 * pos[0]) - old[0] + (a[0] * dt * dt);
+        curVertex->y = (2.00 * pos[1]) - old[1] + (a[1] * dt * dt);
+        curVertex->z = (2.00 * pos[2]) - old[2] + (a[2] * dt * dt);
 
-        vec squareVelocity = velocity;
+        //debug code
+        // if(i == 399) {
+        //     std::cout << "accel:" << a[0] << " " << a[1] << " " << a[2] << std::endl;
+        //     std::cout << "pos:" << oldPos[i][0] << " " << oldPos[i][1] << " " << oldPos[i][2] << std::endl;
+        // }
+            //std::cout << curVertex->x << " " << curVertex->y << " " << curVertex->z << std::endl;
 
-        velocity += g * mass - 0.1 * squareVector(squareVelocity); // apply gravity & bogodrag
     }
-};
+}
+
 
 void Mesh::update() {
-    // physics here, must complete before rendering
 
-    for (int i = 20; i < nVertices; i++) {
+    int k = 30;
+    
+    for (int i = N; i < nVertices; i++) {
+        std::vector<vec> springForces;
         vertex* curVertex = &vertices[i];
-        float t = times[i];
+        vec pos = vectorize(curVertex);
 
-        std::vector<vec> connectedMasses;
-        vec position = vectorize(curVertex);
-        for (auto j : NN[i]) {
-            vertex* n = &vertices[j];
-            connectedMasses.push_back(vectorize(n));
+        vec totalForce = Force(0.0,0.0,0.0).force;
+
+        for (auto j : NN[i]) { // calculate spring forces
+            vertex* nn = &vertices[j];
+            totalForce += springForce(vectorize(nn), pos, k, restLength);
         }
 
-        sys s;
-        s.g = gravity.force;
-        s.mass = mass;
-        s.restLength = restLength;
-        s.k = 6;
-        s.NN = connectedMasses;
-        stepper.do_step(s, position, t, dt);
+        //std::cout << totalForce[0] << " " << totalForce[1] << " " << totalForce[2] << std::endl;
 
-        curVertex->x = position[0];
-        curVertex->y = position[1];
-        curVertex->z = position[2];
+        totalForce += gravity.force * mass;
+        totalForce += wind.force;
+        totalForce -= totalForce * 0.001; //damper, bcuz no veloci=ty
+
+        forces[i] = totalForce;
     }
-
     
+    verlet();
 
     return;
 }

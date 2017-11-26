@@ -16,3 +16,7 @@ vec Force::operator+(vec applyTo) {
 
     return force;
 }
+
+//  Force Force::operator=(Force _force) {
+     
+//  }

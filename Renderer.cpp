@@ -89,6 +89,7 @@ void Renderer::initialize() {
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
+    //glShadeModel(GL_FLAT);
     //glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
     return;
@@ -147,7 +148,6 @@ void Renderer::update() {
 
     glBufferData(GL_ARRAY_BUFFER, (mesh->nVertices) * (9 * sizeof(float)), mesh->vertices, GL_DYNAMIC_DRAW);
     //glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
-    //glShadeModel(GL_FLAT);
     float ratio;
     int width, height;
     glm::mat4 m, v, p, mvp;
