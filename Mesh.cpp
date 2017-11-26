@@ -2,7 +2,7 @@
 
 Mesh::Mesh(int N_, float maxCoord_)
     : N(N_), maxCoord(maxCoord_), nVertices(N_*N_), 
-      dt(0.01f), mass(0.01f) {
+      dt(0.01f), mass(0.001f) {
         this->vertices = new vertex[nVertices];
         this->times = new float[nVertices];
         this->gravity = Force(0.0, -9.8, 0.0);
@@ -150,6 +150,28 @@ vec squareVector(vec v) {
     return v;
 }
 
+// lots of redundant vector operations here
+// could be combined into one proc
+void Mesh::constrainDeformation(int i) {
+    vec v = vectorize(&vertices[i]);
+
+    for (auto j : NN[i]) {
+        vec vc = vectorize(&vertices[j]);
+        vec d = v - vc;
+
+        float tolerence = 0.1f; // MOVE TO GLOBAL
+
+        float d_scalar = norm_2(d);
+        float deformation = (d_scalar - restLength) / d_scalar;
+
+        if (deformation > tolerence) {
+            // inverse procedure
+            v += 0.5 * d_scalar * d;
+            vc -= 0.5 * d_scalar * d;
+        }
+    }
+}
+
 void Mesh::verlet() {
     for (int i = N; i < nVertices; i++) {
         vertex* curVertex = &vertices[i];
@@ -158,7 +180,7 @@ void Mesh::verlet() {
         vec old = oldPos[i];
         oldPos[i] = pos;
         vec totalForce = forces[i];
-        vec a = totalForce / mass;
+        vec a = totalForce; // / mass;
 
         // std::cout << totalForce[0] << " " << totalForce[1] << " " << totalForce[2] << std::endl;
         curVertex->x = (2.00 * pos[0]) - old[0] + (a[0] * dt * dt);
@@ -172,13 +194,14 @@ void Mesh::verlet() {
         // }
             //std::cout << curVertex->x << " " << curVertex->y << " " << curVertex->z << std::endl;
 
+        constrainDeformation(i);
     }
 }
 
 
 void Mesh::update() {
 
-    int k = 30;
+    float k = 40;
     
     for (int i = N; i < nVertices; i++) {
         std::vector<vec> springForces;

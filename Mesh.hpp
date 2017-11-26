@@ -15,6 +15,7 @@ typedef boost::numeric::ublas::vector<float, std::vector<float> > vec;
 
 typedef runge_kutta_dopri5<vec> stepperType;
 typedef std::vector<vec> stateType;
+typedef std::pair<GLuint, int> neighbour; // this type is the pair we want
 // typedef std::vector<float> vec;
 
 class Mesh {
@@ -43,7 +44,7 @@ public:
     std::vector<vec > forces;
 
 
-    std::vector<std::vector<GLuint> > NN;
+    std::vector<neighbour> NN; // note change to index:type mapping
     std::vector<stepperType > steppers;
     float dt;
     float mass;
@@ -54,6 +55,8 @@ public:
     vec vectorize(vertex* v);
     float normalize(vec v, float norm);
     vec squareVector(vec v);
+
+    void constrainDeformation(int i); // beta
         
     void update();
 };
