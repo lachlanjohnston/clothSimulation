@@ -48,51 +48,53 @@ void Mesh::generateMesh() {
 }
 
 std::vector<GLuint> Mesh::determineNN(int index) {
-    //ugly if statements incoming....
+    // Determine the nearest neighbours and the type of spring.
+    // 0 - structural (adajescent)
+    // 1 - shear (diagonal)
 
-    std::vector<GLuint> vNN;
+    std::vector<neighbour> vNN;
 
     /* lets figure out it is a corner first */
 
     if(index == 0) //top left
-        { vNN.push_back(index+1); vNN.push_back(index+N); vNN.push_back(index+N+1); vNN.resize(3); return vNN; }
+        { vNN.push_back(neighbour(index+1,0)); vNN.push_back(neighbour(index+N,0)); vNN.push_back(neighbour(index+N+1,1)); vNN.resize(3); return vNN; }
     if(index == (N-1)) // top right
-        { vNN.push_back(index-1); vNN.push_back(index+N); vNN.push_back(index+N-1); vNN.resize(3); return vNN; }
+        { vNN.push_back(neighbour(index-1,0)); vNN.push_back(neighbour(index+N,0)); vNN.push_back(neighbour(index+N-1,1)); vNN.resize(3); return vNN; }
     if(index == (N*N-N)) // bottom left
-        { vNN.push_back(index+1); vNN.push_back(index-N); vNN.push_back(index-N+1); vNN.resize(3); return vNN;}
+        { vNN.push_back(neighbour(index+1,0)); vNN.push_back(neighbour(index-N,0)); vNN.push_back(neighbour(index-N+1,1)); vNN.resize(3); return vNN;}
     if(index == (N*N-1)) // bottom right
-        { vNN.push_back(index-1); vNN.push_back(index-N); vNN.push_back(index-N-1); vNN.resize(3); return vNN;}
+        { vNN.push_back(neighbour(index-1,0)); vNN.push_back(neighbour(index-N,0)); vNN.push_back(neighbour(index-N-1,1)); vNN.resize(3); return vNN;}
 
     /* checking top edge of mesh */
     if(index < N) {
-        vNN.push_back(index-1); vNN.push_back(index+1); vNN.push_back(index+N); vNN.push_back(index+N-1); vNN.push_back(index+N+1);
+        vNN.push_back(neighbour(index-1,0)); vNN.push_back(neighbour(index+1,0)); vNN.push_back(neighbour(index+N,0)); vNN.push_back(neighbour(index+N-1,1)); vNN.push_back(neighbour(index+N+1,1));
         vNN.resize(5); 
         return vNN;
     }
 
     /* checking left edge of mesh */
     if (index % N == 0) {
-        vNN.push_back(index+1); vNN.push_back(index-N); vNN.push_back(index-N+1); vNN.push_back(index+N); vNN.push_back(index+N+1);
+        vNN.push_back(neighbour(index+1,0)); vNN.push_back(neighbour(index-N,0)); vNN.push_back(neighbour(index-N+1,1)); vNN.push_back(neighbour(index+N,0)); vNN.push_back(neighbour(index+N+1,1));
         vNN.resize(5); 
         return vNN;
     }
 
     /* checking right edge of mesh */
     if((index+1) % N == 0) {
-        vNN.push_back(index-1); vNN.push_back(index-N); vNN.push_back(index-N-1); vNN.push_back(index+N); vNN.push_back(index+N-1);
+        vNN.push_back(neighbour(index-1,0)); vNN.push_back(neighbour(index-N,0)); vNN.push_back(neighbour(index-N-1,1)); vNN.push_back(neighbour(index+N,0)); vNN.push_back(neighbour(index+N-1,1));
         vNN.resize(5); 
         return vNN;
     }
 
     /* checking bottom edge of mesh */
     if((index >= (N*N-N)) && (index < (N*N))) {
-        vNN.push_back(index-1); vNN.push_back(index+1); vNN.push_back(index-N); vNN.push_back(index-N-1); vNN.push_back(index-N+1);
+        vNN.push_back(neighbour(index-1,0)); vNN.push_back(neighbour(index+1,0)); vNN.push_back(neighbour(index-N,0)); vNN.push_back(neighbour(index-N-1,1)); vNN.push_back(neighbour(index-N+1,1));
         vNN.resize(5); 
         return vNN;
     }
 
-    vNN.push_back(index-1); vNN.push_back(index+1); vNN.push_back(index-N); vNN.push_back(index+N);
-    vNN.push_back(index-N-1); vNN.push_back(index-N+1); vNN.push_back(index+N-1); vNN.push_back(index+N+1);
+    vNN.push_back(neighbour(index-1,0)); vNN.push_back(neighbour(index+1,0)); vNN.push_back(neighbour(index-N,0)); vNN.push_back(neighbour(index+N,0));
+    vNN.push_back(neighbour(index-N-1,1)); vNN.push_back(neighbour(index-N+1,1)); vNN.push_back(neighbour(index+N-1,1)); vNN.push_back(neighbour(index+N+1,1));
     vNN.resize(8);
     
     return vNN;
