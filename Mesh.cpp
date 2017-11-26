@@ -192,7 +192,25 @@ void Mesh::verlet() {
         vec totalForce = forces[i];
         vec a = totalForce; // / mass;
 
+        /* 
+            if the wind is in the same direction as the direction vector between a vertex
+            and its nn, then the force of wind should be 0 on that vertex
+
+            or
+
+            dot((v1 - v2), wind) == 0
+
+        */
+
+        // FORCES
+
+
+        totalForce += wind.force;
+        totalForce -= totalForce * 0.001; //damper, bcuz no velocity
+
         // std::cout << totalForce[0] << " " << totalForce[1] << " " << totalForce[2] << std::endl;
+
+        // STEPPER
         curVertex->x = (2.00 * pos[0]) - old[0] + (a[0] * dt * dt);
         curVertex->y = (2.00 * pos[1]) - old[1] + (a[1] * dt * dt);
         curVertex->z = (2.00 * pos[2]) - old[2] + (a[2] * dt * dt);
@@ -225,10 +243,6 @@ void Mesh::update() {
 
         //std::cout << totalForce[0] << " " << totalForce[1] << " " << totalForce[2] << std::endl;
 
-        if (!(cross(gravity.force, Force(0.0, 0.0, -1.0).force) == 0))
-            totalForce += gravity.force * mass;
-        totalForce += wind.force;
-        totalForce -= totalForce * 0.001; //damper, bcuz no veloci=ty
 
         forces[i] = totalForce;
     }
