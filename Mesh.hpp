@@ -3,6 +3,7 @@
 #include <OpenGL/gl.h>
 #include <GLFW/glfw3.h>
 #include <vector>
+#include <math.h>
 #include <boost/numeric/odeint.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 
@@ -15,7 +16,7 @@ typedef boost::numeric::ublas::vector<float, std::vector<float> > vec;
 
 typedef runge_kutta_dopri5<vec> stepperType;
 typedef std::vector<vec> stateType;
-typedef std::pair<GLuint, int> neighbour; // this type is the pair we want
+typedef std::pair<GLuint, GLuint> neighbour; // this type is the pair we want
 // typedef std::vector<float> vec;
 
 class Mesh {
@@ -34,7 +35,7 @@ public:
     Mesh(int N_, float maxCoord_);
     void generateMesh();
     void generateIndices();
-    std::vector<GLuint> determineNN(int index);
+    std::vector<neighbour> determineNN(int index);
     void verlet();
 
     // physics 
@@ -44,11 +45,11 @@ public:
     std::vector<vec > forces;
 
 
-    std::vector<neighbour> NN; // note change to index:type mapping
-    std::vector<stepperType > steppers;
+    std::vector<std::vector<neighbour> > NN; // note change to index:type mapping
+    std::vector<float> restLengths; // 0: structural spring, 1: shear, 2: maybe later...
+    std::vector<float> kValues;
     float dt;
     float mass;
-    float restLength;
     float* times;
     Force gravity, wind;
 

@@ -6,7 +6,11 @@ Mesh::Mesh(int N_, float maxCoord_)
         this->vertices = new vertex[nVertices];
         this->times = new float[nVertices];
         this->gravity = Force(0.0, -9.8, 0.0);
-        this->wind = Force(0.0, 0.0, -0.05);
+        this->wind = Force(0.0, 0.0, -8.0);
+        restLengths.resize(2);
+        kValues.resize(2);
+        kValues[0] = 1000;
+        kValues[1] = 1;
         generateMesh();
         generateIndices();
     };
@@ -14,7 +18,8 @@ Mesh::Mesh(int N_, float maxCoord_)
 void Mesh::generateMesh() {
     float d = ((2.f) * maxCoord) / (N-1);
     float z = 0.f;
-    restLength = d;
+    restLengths[0] = d;
+    restLengths[1] = std::sqrt(2*d*d); // initial diagonal distance
 
     float y = maxCoord;
 
@@ -36,7 +41,7 @@ void Mesh::generateMesh() {
             Force force(0.0, 0.0, 0.0);
             forces.push_back(force.force);
 
-            std::vector<GLuint> vNN = determineNN(index);
+            std::vector<neighbour> vNN = determineNN(index);
             NN.push_back(vNN);
 
             x += d;
@@ -47,7 +52,7 @@ void Mesh::generateMesh() {
     return;
 }
 
-std::vector<GLuint> Mesh::determineNN(int index) {
+std::vector<neighbour> Mesh::determineNN(int index) {
     // Determine the nearest neighbours and the type of spring.
     // 0 - structural (adajescent)
     // 1 - shear (diagonal)
@@ -156,15 +161,18 @@ vec squareVector(vec v) {
 // could be combined into one proc
 void Mesh::constrainDeformation(int i) {
     vec v = vectorize(&vertices[i]);
+    GLuint index, springType;
 
-    for (auto j : NN[i]) {
-        vec vc = vectorize(&vertices[j]);
+    for (auto nn : NN[i]) {
+        index = nn.first;
+        springType = nn.second;
+        vec vc = vectorize(&vertices[index]);
         vec d = v - vc;
 
         float tolerence = 0.1f; // MOVE TO GLOBAL
 
         float d_scalar = norm_2(d);
-        float deformation = (d_scalar - restLength) / d_scalar;
+        float deformation = (d_scalar - restLengths[springType]) / d_scalar;
 
         if (deformation > tolerence) {
             // inverse procedure
@@ -202,8 +210,6 @@ void Mesh::verlet() {
 
 
 void Mesh::update() {
-
-    float k = 40;
     
     for (int i = N; i < nVertices; i++) {
         std::vector<vec> springForces;
@@ -212,14 +218,15 @@ void Mesh::update() {
 
         vec totalForce = Force(0.0,0.0,0.0).force;
 
-        for (auto j : NN[i]) { // calculate spring forces
-            vertex* nn = &vertices[j];
-            totalForce += springForce(vectorize(nn), pos, k, restLength);
+        for (auto nn : NN[i]) { // calculate spring forces
+            vertex* nnv = &vertices[nn.first];
+            totalForce += springForce(vectorize(nnv), pos, kValues[nn.second], restLengths[nn.second]);
         }
 
         //std::cout << totalForce[0] << " " << totalForce[1] << " " << totalForce[2] << std::endl;
 
-        totalForce += gravity.force * mass;
+        if (!(cross(gravity.force, Force(0.0, 0.0, -1.0).force) == 0))
+            totalForce += gravity.force * mass;
         totalForce += wind.force;
         totalForce -= totalForce * 0.001; //damper, bcuz no veloci=ty
 

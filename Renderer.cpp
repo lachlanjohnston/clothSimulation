@@ -12,7 +12,6 @@ void Renderer::initialize() {
     // initialize buffer states, shaders here
     glGenBuffers(1, &meshElementBuffer);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, meshElementBuffer);
-    std::cout << sizeof(mesh->indices) << std::endl;
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->indices.size() * sizeof(GLuint), &mesh->indices[0], GL_STATIC_DRAW);
 
     glGenBuffers(1, &vertexObjectBuffer);
@@ -103,11 +102,11 @@ void Renderer::render() {
 void Renderer::update() {
     // delegate required frame update tasks
 
-    std::vector<std::vector<GLuint> > NNary = mesh->NN;
+    std::vector<std::vector<neighbour> > NNary = mesh->NN;
     int N = mesh->N;
 
     for(int i = 0; i < mesh->nVertices; i++) {
-        std::vector<GLuint> vNN = NNary[i];
+        std::vector<neighbour> vNN = NNary[i];
 
         mesh->vertices[i].n1 = 0.f;
         mesh->vertices[i].n2 = 0.f;
@@ -118,20 +117,20 @@ void Renderer::update() {
 
         for(auto it = vNN.begin(); it != vNN.end(); it++) {
             
-            if((i - 1) == *it) { //left
-                vLeft = glm::vec3(mesh->vertices[*it].x, mesh->vertices[*it].y, mesh->vertices[*it].z);
+            if((i - 1) == (*it).first) { //left
+                vLeft = glm::vec3(mesh->vertices[(*it).first].x, mesh->vertices[(*it).first].y, mesh->vertices[(*it).first].z);
             }
 
-            if((i + 1) == *it) { //right
-                vRight = glm::vec3(mesh->vertices[*it].x, mesh->vertices[*it].y, mesh->vertices[*it].z);
+            if((i + 1) == (*it).first) { //right
+                vRight = glm::vec3(mesh->vertices[(*it).first].x, mesh->vertices[(*it).first].y, mesh->vertices[(*it).first].z);
             }
 
-            if((i - N) == *it) { //above
-                vAbove = glm::vec3(mesh->vertices[*it].x, mesh->vertices[*it].y, mesh->vertices[*it].z);
+            if((i - N) == (*it).first) { //above
+                vAbove = glm::vec3(mesh->vertices[(*it).first].x, mesh->vertices[(*it).first].y, mesh->vertices[(*it).first].z);
             }
 
-            if((i + N) == *it) { //below
-                vBelow = glm::vec3(mesh->vertices[*it].x, mesh->vertices[*it].y, mesh->vertices[*it].z);
+            if((i + N) == (*it).first) { //below
+                vBelow = glm::vec3(mesh->vertices[(*it).first].x, mesh->vertices[(*it).first].y, mesh->vertices[(*it).first].z);
             }
         }
 
