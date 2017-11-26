@@ -48,8 +48,7 @@ public:
         "    fPos = vPos;\n"
         "    fNorm = vNorm;\n"
         "}\n";
-
-    // consider moving normal mat calc outside of shader and create a uniform for it    
+ 
     const char* fragment_shader_text =
         "uniform mat4 model;\n"
         "uniform struct Light {\n"
@@ -61,16 +60,13 @@ public:
         "varying vec3 fNorm;\n"
         "void main()\n"
         "{\n"
-        //"    mat3 normMat = transpose(inverse(mat3(model[0].xyz, model[1].xyz, model[2].xyz)));\n"
-        //"    vec3 normal = normalize(normMat * fNorm);\n"
         "    vec3 normal = normalize(mat3(model[0].xyz, model[1].xyz, model[2].xyz) * fNorm);\n"
         "    vec3 pos = vec3(model * vec4(fPos, 1));\n"
         "    vec3 dist = light.position - pos;\n"
         "    float brightness = dot(normal, dist) / (length(dist) * length(normal));\n"
         "    brightness = clamp(brightness, 0.0, 1.0);\n"
-        //"    gl_FragColor = vec4(brightness * fCol, 1.0);\n"
-        "    gl_FragColor = vec4(brightness * light.intensities * fCol, 1.0);\n"
-        //"    gl_FragColor = vec4(fCol, 1.0);\n"
+        "    vec3 ambient = vec3(0.12, 0.12, 0.12) * fCol;\n"
+        "    gl_FragColor = vec4((brightness * light.intensities * fCol) + ambient, 1.0);\n"
         "}\n";
 };
 

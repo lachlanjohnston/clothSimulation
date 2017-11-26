@@ -2,17 +2,18 @@
 
 Mesh::Mesh(int N_, float maxCoord_)
     : N(N_), maxCoord(maxCoord_), nVertices(N_*N_), 
-      dt(0.01f), mass(0.001f) {
+      dt(0.005f), mass(0.001f) {
         this->vertices = new vertex[nVertices];
         this->times = new float[nVertices];
         this->gravity = Force(0.0, -9.8, 0.0);
         this->wind = Force(0.0, 0.0, -.005);
-        restLengths.resize(2);
         kValues.resize(2);
-        kValues[0] = 1000;
-        kValues[1] = 1;
+        kValues[0] = 20;
+        kValues[1] = 15;
+        restLengths.resize(2);
 
         ignoreVertices = {0, 1, 20, 21, 18, 19, 38, 39};
+        //ignoreVertices = {0, 1, N_, N_+1, N_-1, N_-2, 2*N_ - 1, 2*N_ - 2};
 
         generateMesh();
         generateIndices();
@@ -175,6 +176,7 @@ void Mesh::constrainDeformation(int i) {
     vec vc = oldPos[i];
     vec d = v - vc;
 
+    if()
     float tolerence = 0.1f; // MOVE TO GLOBAL
 
     float d_scalar = norm_2(d);
@@ -204,33 +206,23 @@ void Mesh::verlet() {
 
         vec totalForce = forces[i];
         totalForce += wind.force;
-        totalForce -= totalForce * 0.001; //damper, bcuz no velocity
-        vec a = totalForce; // / mass;
-        
+        totalForce += gravity.force * mass;
+        totalForce -= totalForce *  0.001; //damper, bcuz no velocity
+        vec a = totalForce / mass; // / mass;
 
-        /* 
-            if the wind is in the same direction as the direction vector between a vertex
-            and its nn, then the force of wind should be 0 on that vertex
-
-            or
-
-            dot((v1 - v2), wind) == 1
-
-        */
-
-        // std::cout << totalForce[0] << " " << totalForce[1] << " " << totalForce[2] << std::endl;
+         //td::cout << totalForce[0] << " " << totalForce[1] << " " << totalForce[2] << std::endl;
 
         // STEPPER
 
-        curVertex->x = (2.00 * pos[0]) - old[0] + (a[0] * dt * dt);
-        curVertex->y = (2.00 * pos[1]) - old[1] + (a[1] * dt * dt);
-        curVertex->z = (2.00 * pos[2]) - old[2] + (a[2] * dt * dt);
+        curVertex->x = (2.0 * pos[0]) - old[0] + (a[0] * dt * dt);
+        curVertex->y = (2.0  * pos[1]) - old[1] + (a[1] * dt * dt);
+        curVertex->z = (2.0  * pos[2]) - old[2] + (a[2] * dt * dt);
 
         //debug code
-        // if(i == 399) {
-        //     std::cout << "accel:" << a[0] << " " << a[1] << " " << a[2] << std::endl;
-        //     std::cout << "pos:" << oldPos[i][0] << " " << oldPos[i][1] << " " << oldPos[i][2] << std::endl;
-        // }
+        if(i == 399) {
+            std::cout << "accel:" << a[0] << " " << a[1] << " " << a[2] << std::endl;
+            std::cout << "pos:" << oldPos[i][0] << " " << oldPos[i][1] << " " << oldPos[i][2] << std::endl;
+        }
             //std::cout << curVertex->x << " " << curVertex->y << " " << curVertex->z << std::endl;
 
         constrainDeformation(i);
