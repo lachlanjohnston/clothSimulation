@@ -31,7 +31,7 @@ public:
         glm::vec3 intensities; //a.k.a. the color of the light
     };
 
-    Light gLight = { glm::vec3(5.f,-10.f,25.0f), glm::vec3(0.2f,0.6f,0.5f) };
+    Light gLight = { glm::vec3(5.f,0.f,25.0f), glm::vec3(0.2f,0.6f,0.5f) };
 
     const char* vertex_shader_text =
         "uniform mat4 MVP;\n"

@@ -6,11 +6,14 @@ Mesh::Mesh(int N_, float maxCoord_)
         this->vertices = new vertex[nVertices];
         this->times = new float[nVertices];
         this->gravity = Force(0.0, -9.8, 0.0);
-        this->wind = Force(0.0, 0.0, -8.0);
+        this->wind = Force(0.0, 0.0, -.05);
         restLengths.resize(2);
         kValues.resize(2);
         kValues[0] = 1000;
         kValues[1] = 1;
+
+        ignoreVertices = {0, 1, 20, 21};
+
         generateMesh();
         generateIndices();
     };
@@ -183,14 +186,23 @@ void Mesh::constrainDeformation(int i) {
 }
 
 void Mesh::verlet() {
-    for (int i = N; i < nVertices; i++) {
+    for (int i = 0; i < nVertices; i++) {
+        if (ignoreVertices.count(i) > 0) continue;
+
         vertex* curVertex = &vertices[i];
         std::vector<vec> connectedMasses;
         vec pos = vectorize(curVertex);
         vec old = oldPos[i];
         oldPos[i] = pos;
+        
+
+        // FORCES
+
         vec totalForce = forces[i];
+        totalForce += wind.force;
+        totalForce -= totalForce * 0.001; //damper, bcuz no velocity
         vec a = totalForce; // / mass;
+        
 
         /* 
             if the wind is in the same direction as the direction vector between a vertex
@@ -202,15 +214,10 @@ void Mesh::verlet() {
 
         */
 
-        // FORCES
-
-
-        totalForce += wind.force;
-        totalForce -= totalForce * 0.001; //damper, bcuz no velocity
-
         // std::cout << totalForce[0] << " " << totalForce[1] << " " << totalForce[2] << std::endl;
 
         // STEPPER
+        
         curVertex->x = (2.00 * pos[0]) - old[0] + (a[0] * dt * dt);
         curVertex->y = (2.00 * pos[1]) - old[1] + (a[1] * dt * dt);
         curVertex->z = (2.00 * pos[2]) - old[2] + (a[2] * dt * dt);
@@ -229,7 +236,9 @@ void Mesh::verlet() {
 
 void Mesh::update() {
     
-    for (int i = N; i < nVertices; i++) {
+    for (int i = 0; i < nVertices; i++) {
+        if (ignoreVertices.count(i) > 0) continue;
+
         std::vector<vec> springForces;
         vertex* curVertex = &vertices[i];
         vec pos = vectorize(curVertex);

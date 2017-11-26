@@ -28,6 +28,7 @@ public:
     };
 
     vertex* vertices;
+    std::set<GLuint> ignoreVertices;
     std::vector<GLuint> indices;
     float maxCoord; 
     int nVertices, nIndices, N;
