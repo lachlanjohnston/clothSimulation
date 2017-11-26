@@ -38,6 +38,7 @@ public:
     void generateIndices();
     std::vector<neighbour> determineNN(int index);
     void verlet();
+    void assign(int i, vec v);
 
     // physics 
 

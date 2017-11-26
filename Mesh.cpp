@@ -6,13 +6,13 @@ Mesh::Mesh(int N_, float maxCoord_)
         this->vertices = new vertex[nVertices];
         this->times = new float[nVertices];
         this->gravity = Force(0.0, -9.8, 0.0);
-        this->wind = Force(0.0, 0.0, -.05);
+        this->wind = Force(0.0, 0.0, -.005);
         restLengths.resize(2);
         kValues.resize(2);
         kValues[0] = 1000;
         kValues[1] = 1;
 
-        ignoreVertices = {0, 1, 20, 21};
+        ignoreVertices = {0, 1, 20, 21, 18, 19, 38, 39};
 
         generateMesh();
         generateIndices();
@@ -160,28 +160,32 @@ vec squareVector(vec v) {
     return v;
 }
 
+void Mesh::assign(int i, vec v) {
+    vertices[i].x = v[0];
+    vertices[i].y = v[1];
+    vertices[i].z = v[2];
+}
+
 // lots of redundant vector operations here
 // could be combined into one proc
 void Mesh::constrainDeformation(int i) {
     vec v = vectorize(&vertices[i]);
     GLuint index, springType;
 
-    for (auto nn : NN[i]) {
-        index = nn.first;
-        springType = nn.second;
-        vec vc = vectorize(&vertices[index]);
-        vec d = v - vc;
+    vec vc = oldPos[i];
+    vec d = v - vc;
 
-        float tolerence = 0.1f; // MOVE TO GLOBAL
+    float tolerence = 0.1f; // MOVE TO GLOBAL
 
-        float d_scalar = norm_2(d);
-        float deformation = (d_scalar - restLengths[springType]) / d_scalar;
+    float d_scalar = norm_2(d);
+    float deformation = (d_scalar - restLengths[0]) / d_scalar;
 
-        if (deformation > tolerence) {
-            // inverse procedure
-            v += 0.5 * d_scalar * d;
-            vc -= 0.5 * d_scalar * d;
-        }
+    if (deformation > tolerence) {
+        // inverse procedure
+        v += 0.5 * d_scalar * d;
+        vc -= 0.5 * d_scalar * d;
+        assign(i, v);
+        oldPos[i] = vc;
     }
 }
 
@@ -210,14 +214,14 @@ void Mesh::verlet() {
 
             or
 
-            dot((v1 - v2), wind) == 0
+            dot((v1 - v2), wind) == 1
 
         */
 
         // std::cout << totalForce[0] << " " << totalForce[1] << " " << totalForce[2] << std::endl;
 
         // STEPPER
-        
+
         curVertex->x = (2.00 * pos[0]) - old[0] + (a[0] * dt * dt);
         curVertex->y = (2.00 * pos[1]) - old[1] + (a[1] * dt * dt);
         curVertex->z = (2.00 * pos[2]) - old[2] + (a[2] * dt * dt);
