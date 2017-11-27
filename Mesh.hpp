@@ -6,6 +6,7 @@
 #include <math.h>
 #include <boost/numeric/odeint.hpp>
 #include <boost/numeric/ublas/vector.hpp>
+#include <random>
 
 #include "Force.hpp"
 
@@ -32,6 +33,7 @@ public:
     std::vector<GLuint> indices;
     float maxCoord; 
     int nVertices, nIndices, N;
+    bool toggleWind = true;
 
     Mesh(int N_, float maxCoord_);
     void generateMesh();
@@ -60,6 +62,8 @@ public:
     vec squareVector(vec v);
 
     void constrainDeformation(int i); // beta
+
+    vec getWind();
         
     void update();
 };

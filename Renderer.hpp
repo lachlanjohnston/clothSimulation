@@ -19,12 +19,14 @@ public:
     void initialize();
     void render();
     void update();
+    void moveCamera();
     // buffering
     
     GLuint meshElementBuffer, vertexObjectBuffer, program, vertexShader, fragShader, vao;
     GLint positionLoc, colorLoc, normLoc, lightPosLoc, lightIntenLoc, MVP, model;
 
     int elementSize;
+    bool toggleFrame = false;
 
     struct Light {
         glm::vec3 position;

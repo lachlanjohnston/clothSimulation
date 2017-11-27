@@ -18,10 +18,26 @@
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;
 
+ //n must be AT LEAST 3!!!
+int n = 20; float maxDistance = 1.f;
+Mesh* mesh;
+Renderer* r;
+
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GLFW_TRUE);
+
+     if (key == GLFW_KEY_W && action == GLFW_PRESS)
+        mesh->toggleWind = !mesh->toggleWind;
+
+    if (key == GLFW_KEY_F && action == GLFW_PRESS)
+        r->toggleFrame = !r->toggleFrame;
+
+    if(key == GLFW_KEY_RIGHT && action == GLFW_PRESS)
+        r->moveCamera();
+        
+        
 }
 static void error_callback(int error, const char* description)
 {
@@ -52,10 +68,9 @@ int main() {
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
 
-    //n must be AT LEAST 3!!!
-	int n = 20; float maxDistance = 1.f;
-	Mesh* mesh = new Mesh(n, maxDistance);
-	Renderer* r = new Renderer(mesh, window);
+    mesh = new Mesh(n, maxDistance);
+	r = new Renderer(mesh, window);
+    
 
 	while (!glfwWindowShouldClose(window)) {
 		mesh->update(); // update mesh via physics engine

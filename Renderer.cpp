@@ -146,7 +146,12 @@ void Renderer::update() {
     }
 
     glBufferData(GL_ARRAY_BUFFER, (mesh->nVertices) * (9 * sizeof(float)), mesh->vertices, GL_DYNAMIC_DRAW);
-    //glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
+
+    if(toggleFrame)
+        glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
+    else
+        glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
+
     float ratio;
     int width, height;
     glm::mat4 m, v, p, mvp;

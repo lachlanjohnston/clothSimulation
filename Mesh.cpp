@@ -12,7 +12,10 @@ Mesh::Mesh(int N_, float maxCoord_)
         kValues[1] = 15;
         restLengths.resize(2);
 
-        ignoreVertices = {0, 1, 20, 21, 18, 19, 38, 39};
+         //ignoreVertices = {0, 1, 20, 21, 18, 19, 38, 39};
+         ignoreVertices = {0,1,20,380,381,360};
+        //ignoreVertices = {0, 1, 20, 21, 18, 19, 38, 39, 399, 379, 398, 378, 379, 359, 380, 360};
+        //ignoreVertices = {0,1,20,21};
         //ignoreVertices = {0, 1, N_, N_+1, N_-1, N_-2, 2*N_ - 1, 2*N_ - 2};
 
         generateMesh();
@@ -156,7 +159,7 @@ vec springForce(vec v1, vec v2, float k, float restLength) {
     return force;
 }
 
-vec squareVector(vec v) { 
+vec Vector(vec v) { 
     for (auto i : v) i *= i; 
     return v;
 }
@@ -176,7 +179,6 @@ void Mesh::constrainDeformation(int i) {
     vec vc = oldPos[i];
     vec d = v - vc;
 
-    if()
     float tolerence = 0.1f; // MOVE TO GLOBAL
 
     float d_scalar = norm_2(d);
@@ -191,6 +193,34 @@ void Mesh::constrainDeformation(int i) {
     }
 }
 
+vec Mesh::getWind() {
+    static float zforceValue;
+    static float xforceValue;
+    float newWind;
+    std::random_device rd;  
+    std::mt19937 gen(rd()); 
+    std::uniform_real_distribution<> zWind(0.0, 0.05);
+    std::uniform_real_distribution<> xWind(-0.05, 0.05);
+
+    std::uniform_real_distribution<> changeDir(0.0, 1.0);
+    
+    if (changeDir(gen) < 0.01) {
+        // std::cout << "same dir" << std::endl;
+        zforceValue = -zWind(gen);
+        return Force(xforceValue, 0.0, zforceValue).force; 
+    } else {
+        newWind = xWind(gen);
+        while (std::abs(newWind - xforceValue) > 0.05) 
+            newWind = xWind(gen);
+
+        // std::cout << "Direction changed: " << xforceValue << " -> " << newWind << std::endl;
+
+        xforceValue = newWind;
+        return Force(xforceValue, 0.0, zforceValue).force; 
+    }
+    
+}
+
 void Mesh::verlet() {
     for (int i = 0; i < nVertices; i++) {
         if (ignoreVertices.count(i) > 0) continue;
@@ -199,15 +229,18 @@ void Mesh::verlet() {
         std::vector<vec> connectedMasses;
         vec pos = vectorize(curVertex);
         vec old = oldPos[i];
-        oldPos[i] = pos;
+        
+
+        vec instVel = ((pos - old) / dt);
         
 
         // FORCES
 
         vec totalForce = forces[i];
-        totalForce += wind.force;
+        if (toggleWind)
+            totalForce += getWind();
         totalForce += gravity.force * mass;
-        totalForce -= totalForce *  0.001; //damper, bcuz no velocity
+        totalForce -= 0.01 * instVel; //damper, bcuz no velocity
         vec a = totalForce / mass; // / mass;
 
          //td::cout << totalForce[0] << " " << totalForce[1] << " " << totalForce[2] << std::endl;
@@ -218,14 +251,15 @@ void Mesh::verlet() {
         curVertex->y = (2.0  * pos[1]) - old[1] + (a[1] * dt * dt);
         curVertex->z = (2.0  * pos[2]) - old[2] + (a[2] * dt * dt);
 
-        //debug code
-        if(i == 399) {
-            std::cout << "accel:" << a[0] << " " << a[1] << " " << a[2] << std::endl;
-            std::cout << "pos:" << oldPos[i][0] << " " << oldPos[i][1] << " " << oldPos[i][2] << std::endl;
-        }
+        // //debug code
+        // if(i == 399) {
+        //     std::cout << "accel:" << a[0] << " " << a[1] << " " << a[2] << std::endl;
+        //     std::cout << "pos:" << oldPos[i][0] << " " << oldPos[i][1] << " " << oldPos[i][2] << std::endl;
+        // }
             //std::cout << curVertex->x << " " << curVertex->y << " " << curVertex->z << std::endl;
 
         constrainDeformation(i);
+        oldPos[i] = pos;
     }
 }
 
