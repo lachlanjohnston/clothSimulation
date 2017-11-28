@@ -34,8 +34,8 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
     if (key == GLFW_KEY_F && action == GLFW_PRESS)
         r->toggleFrame = !r->toggleFrame;
 
-    if(key == GLFW_KEY_RIGHT && action == GLFW_PRESS)
-        r->moveCamera();
+    // if(key == GLFW_KEY_RIGHT && action == GLFW_PRESS)
+    //     r->moveCamera();
         
         
 }

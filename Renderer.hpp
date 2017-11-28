@@ -19,7 +19,6 @@ public:
     void initialize();
     void render();
     void update();
-    void moveCamera();
     // buffering
     
     GLuint meshElementBuffer, vertexObjectBuffer, program, vertexShader, fragShader, vao;
