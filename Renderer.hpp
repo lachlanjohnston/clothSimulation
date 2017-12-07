@@ -19,7 +19,7 @@ public:
     void initialize();
     void render();
     void update();
-    void moveCamera();
+    void moveCamera(int dir);
     // buffering
     
     GLuint meshElementBuffer, vertexObjectBuffer, program, vertexShader, fragShader, vao;
@@ -33,7 +33,11 @@ public:
         glm::vec3 intensities; //a.k.a. the color of the light
     };
 
-    Light gLight = { glm::vec3(5.f,0.f,25.0f), glm::vec3(0.2f,0.6f,0.5f) };
+    Light gLight = { glm::vec3(5.f,0.f,25.0f), glm::vec3(1.0f,0.0f,0.0f) };
+
+    glm::vec3 Pos = glm::vec3(3.0f, 3.0f, 3.f);
+    glm::vec3 Target = glm::vec3(0.0f, 0.0f, -0.5f);
+    glm::vec3 Up = glm::vec3(0.0f, 1.0f, 0.0f);
 
     const char* vertex_shader_text =
         "uniform mat4 MVP;\n"
@@ -67,7 +71,7 @@ public:
         "    vec3 dist = light.position - pos;\n"
         "    float brightness = dot(normal, dist) / (length(dist) * length(normal));\n"
         "    brightness = clamp(brightness, 0.0, 1.0);\n"
-        "    vec3 ambient = vec3(0.12, 0.12, 0.12) * fCol;\n"
+        "    vec3 ambient = vec3(0.2, 0.2, 0.2) * fCol;\n"
         "    gl_FragColor = vec4((brightness * light.intensities * fCol) + ambient, 1.0);\n"
         "}\n";
 };

@@ -15,11 +15,11 @@
 // by springs.
 //
 
-const int WINDOW_WIDTH = 800;
-const int WINDOW_HEIGHT = 600;
+const int WINDOW_WIDTH = 1000;
+const int WINDOW_HEIGHT = 800;
 
  //n must be AT LEAST 3!!!
-int n = 20; float maxDistance = 1.f;
+int n = 20; float maxDistance = 1.0f;
 Mesh* mesh;
 Renderer* r;
 
@@ -35,7 +35,13 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
         r->toggleFrame = !r->toggleFrame;
 
     if(key == GLFW_KEY_RIGHT && action == GLFW_PRESS)
-        r->moveCamera();
+        r->moveCamera(-3);
+    if(key == GLFW_KEY_LEFT && action == GLFW_PRESS)
+        r->moveCamera(3);
+    if(key == GLFW_KEY_UP && action == GLFW_PRESS)
+        r->moveCamera(-1);
+    if(key == GLFW_KEY_DOWN && action == GLFW_PRESS)
+        r->moveCamera(1);
         
         
 }
@@ -57,7 +63,7 @@ int main() {
     // glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     // glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    window = glfwCreateWindow(640, 480, "Simple example", NULL, NULL);
+    window = glfwCreateWindow(640, 480, "Simple cloth", NULL, NULL);
 
     if (!window)
     {

@@ -2,7 +2,7 @@
 
 Mesh::Mesh(int N_, float maxCoord_)
     : N(N_), maxCoord(maxCoord_), nVertices(N_*N_), 
-      dt(0.005f), mass(0.001f) {
+      dt(0.005f), mass(0.38f/nVertices) { 
         this->vertices = new vertex[nVertices];
         this->times = new float[nVertices];
         this->gravity = Force(0.0, -9.8, 0.0);
@@ -14,6 +14,8 @@ Mesh::Mesh(int N_, float maxCoord_)
 
          //ignoreVertices = {0, 1, 20, 21, 18, 19, 38, 39};
          ignoreVertices = {0,1,20,380,381,360};
+         //ignoreVertices = {0,1,30,870,871,840};
+
         //ignoreVertices = {0, 1, 20, 21, 18, 19, 38, 39, 399, 379, 398, 378, 379, 359, 380, 360};
         //ignoreVertices = {0,1,20,21};
         //ignoreVertices = {0, 1, N_, N_+1, N_-1, N_-2, 2*N_ - 1, 2*N_ - 2};
@@ -33,7 +35,8 @@ void Mesh::generateMesh() {
     for (int i = 0; i < N; i++) {
         float x = (-1.f) * maxCoord;
         for(int j = 0; j < N; j++) {
-            vertex v = {x, y, z, 1.f, 1.f, 1.f, 0.0f, 0.0f, 1.0f};
+            //pos,color,normal
+            vertex v = {x, y, z, 1.f, 0.f, 0.f, 0.0f, 0.0f, 1.0f};
 
             int index = j + (i*N);
             vertices[index] = v;
@@ -258,7 +261,7 @@ void Mesh::verlet() {
         // }
             //std::cout << curVertex->x << " " << curVertex->y << " " << curVertex->z << std::endl;
 
-        constrainDeformation(i);
+        //constrainDeformation(i);
         oldPos[i] = pos;
     }
 }

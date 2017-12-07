@@ -99,6 +99,19 @@ void Renderer::render() {
     return;
 }
 
+void Renderer::moveCamera(int dir) {
+    if(dir == 3) //z
+        this->Pos += glm::vec3(0.0f,0.0f,0.5f);
+    else if(dir == -3) //-z
+        this->Pos += glm::vec3(0.0f,0.0f,-0.5f);
+    else if(dir == 1) //x
+        this->Pos += glm::vec3(0.5f,0.0f,0.0f);
+    else if(dir == -1) //-x
+        this->Pos += glm::vec3(-0.5f,0.0f,0.0f);
+
+    return;
+}
+
 void Renderer::update() {
     // delegate required frame update tasks
 
@@ -159,10 +172,6 @@ void Renderer::update() {
     ratio = width / (float) height;
     glViewport(0, 0, width, height);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    glm::vec3 Pos(3.0f, 3.0f, 3.f);
-    glm::vec3 Target(0.0f, 0.0f, 0.0f);
-    glm::vec3 Up(0.0f, 1.0f, 0.0f);
 
     float fov = 0.785398f;
 
