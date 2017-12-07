@@ -12,13 +12,7 @@ Mesh::Mesh(int N_, float maxCoord_)
         kValues[1] = 15;
         restLengths.resize(2);
 
-         //ignoreVertices = {0, 1, 20, 21, 18, 19, 38, 39};
-         ignoreVertices = {0,1,20,380,381,360};
-         //ignoreVertices = {0,1,30,870,871,840};
-
-        //ignoreVertices = {0, 1, 20, 21, 18, 19, 38, 39, 399, 379, 398, 378, 379, 359, 380, 360};
-        //ignoreVertices = {0,1,20,21};
-        //ignoreVertices = {0, 1, N_, N_+1, N_-1, N_-2, 2*N_ - 1, 2*N_ - 2};
+        ignoreVertices = {0,1,20,380,381,360};
 
         generateMesh();
         generateIndices();
@@ -176,23 +170,29 @@ void Mesh::assign(int i, vec v) {
 // lots of redundant vector operations here
 // could be combined into one proc
 void Mesh::constrainDeformation(int i) {
+    if (ignoreVertices.count(i) > 0) return;
     vec v = vectorize(&vertices[i]);
     GLuint index, springType;
 
-    vec vc = oldPos[i];
-    vec d = v - vc;
+    float deformationCorrection = 0.05;
 
-    float tolerence = 0.1f; // MOVE TO GLOBAL
+    for (auto j : NN[i]) {
+        if (ignoreVertices.count(j.first) > 0) continue;
+        vec neigh = vectorize(&vertices[j.first]);
+        vec d = v - neigh;
 
-    float d_scalar = norm_2(d);
-    float deformation = (d_scalar - restLengths[0]) / d_scalar;
+        float tolerence = 0.15f; // MOVE TO GLOBAL
 
-    if (deformation > tolerence) {
-        // inverse procedure
-        v += 0.5 * d_scalar * d;
-        vc -= 0.5 * d_scalar * d;
-        assign(i, v);
-        oldPos[i] = vc;
+        float d_scalar = norm_2(d);
+        float deformation = std::abs(d_scalar - restLengths[j.second]) / d_scalar;
+
+        if (deformation > tolerence) {
+            // inverse procedure
+            v     -= deformationCorrection * d_scalar * d;
+            neigh += deformationCorrection * d_scalar * d;
+            assign(i, v);
+            assign(j.first, neigh);
+        }
     }
 }
 
@@ -246,22 +246,13 @@ void Mesh::verlet() {
         totalForce -= 0.01 * instVel; //damper, bcuz no velocity
         vec a = totalForce / mass; // / mass;
 
-         //td::cout << totalForce[0] << " " << totalForce[1] << " " << totalForce[2] << std::endl;
-
         // STEPPER
 
         curVertex->x = (2.0 * pos[0]) - old[0] + (a[0] * dt * dt);
         curVertex->y = (2.0  * pos[1]) - old[1] + (a[1] * dt * dt);
         curVertex->z = (2.0  * pos[2]) - old[2] + (a[2] * dt * dt);
 
-        // //debug code
-        // if(i == 399) {
-        //     std::cout << "accel:" << a[0] << " " << a[1] << " " << a[2] << std::endl;
-        //     std::cout << "pos:" << oldPos[i][0] << " " << oldPos[i][1] << " " << oldPos[i][2] << std::endl;
-        // }
-            //std::cout << curVertex->x << " " << curVertex->y << " " << curVertex->z << std::endl;
-
-        //constrainDeformation(i);
+        constrainDeformation(i);
         oldPos[i] = pos;
     }
 }
@@ -283,13 +274,10 @@ void Mesh::update() {
             totalForce += springForce(vectorize(nnv), pos, kValues[nn.second], restLengths[nn.second]);
         }
 
-        //std::cout << totalForce[0] << " " << totalForce[1] << " " << totalForce[2] << std::endl;
-
-
         forces[i] = totalForce;
     }
     
     verlet();
 
     return;
-}
+}r

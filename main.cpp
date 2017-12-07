@@ -65,6 +65,11 @@ int main() {
 
     window = glfwCreateWindow(640, 480, "Simple cloth", NULL, NULL);
 
+
+    std::cout << "W: Toggle wind force" << std::endl;
+    std::cout << "F: Toggle wire frame" << std::endl;
+    std::cout << "Arrow keys: Move (naive) camera" << std::endl;
+
     if (!window)
     {
         glfwTerminate();
